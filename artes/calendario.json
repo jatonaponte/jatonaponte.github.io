@@ -1,0 +1,594 @@
+[
+ {
+  "data": "2026-11-17",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #13",
+  "slug": "cur13",
+  "altura": 1350,
+  "arquivos": [
+   "2026-11-17-cur13"
+  ]
+ },
+ {
+  "data": "2026-11-19",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #1",
+  "slug": "meme01",
+  "altura": 1350,
+  "arquivos": [
+   "2026-11-19-meme01"
+  ]
+ },
+ {
+  "data": "2026-11-21",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 1/13 · fato #1",
+  "slug": "hist01",
+  "altura": 1350,
+  "arquivos": [
+   "2026-11-21-hist01"
+  ]
+ },
+ {
+  "data": "2026-11-24",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #5",
+  "slug": "cur05",
+  "altura": 1350,
+  "arquivos": [
+   "2026-11-24-cur05"
+  ]
+ },
+ {
+  "data": "2026-11-26",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "carrossel",
+  "pauta": "Meme #2",
+  "slug": "meme02",
+  "altura": 1350,
+  "arquivos": [
+   "2026-11-26-meme02-1",
+   "2026-11-26-meme02-2",
+   "2026-11-26-meme02-3"
+  ]
+ },
+ {
+  "data": "2026-11-28",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 2/13 · fato #2",
+  "slug": "hist02",
+  "altura": 1350,
+  "arquivos": [
+   "2026-11-28-hist02"
+  ]
+ },
+ {
+  "data": "2026-12-01",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #6",
+  "slug": "cur06",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-01-cur06"
+  ]
+ },
+ {
+  "data": "2026-12-03",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #3",
+  "slug": "meme03",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-03-meme03"
+  ]
+ },
+ {
+  "data": "2026-12-05",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 3/13 · fato #3",
+  "slug": "hist03",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-05-hist03"
+  ]
+ },
+ {
+  "data": "2026-12-08",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #10",
+  "slug": "cur10",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-08-cur10"
+  ]
+ },
+ {
+  "data": "2026-12-10",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #4",
+  "slug": "meme04",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-10-meme04"
+  ]
+ },
+ {
+  "data": "2026-12-12",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 4/13 · fato #7",
+  "slug": "hist07",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-12-hist07"
+  ]
+ },
+ {
+  "data": "2026-12-15",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #8",
+  "slug": "cur08",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-15-cur08"
+  ]
+ },
+ {
+  "data": "2026-12-17",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #5",
+  "slug": "meme05",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-17-meme05"
+  ]
+ },
+ {
+  "data": "2026-12-19",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 5/13 · fato #8",
+  "slug": "hist08",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-19-hist08"
+  ]
+ },
+ {
+  "data": "2026-12-22",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #11",
+  "slug": "cur11",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-22-cur11"
+  ]
+ },
+ {
+  "data": "2026-12-24",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #20",
+  "slug": "meme20",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-24-meme20"
+  ]
+ },
+ {
+  "data": "2026-12-26",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 6/13 · fato #9",
+  "slug": "hist09",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-26-hist09"
+  ]
+ },
+ {
+  "data": "2026-12-29",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "Nesta data · fato #4",
+  "slug": "hist04",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-29-hist04"
+  ]
+ },
+ {
+  "data": "2026-12-31",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #6",
+  "slug": "meme06",
+  "altura": 1350,
+  "arquivos": [
+   "2026-12-31-meme06"
+  ]
+ },
+ {
+  "data": "2027-01-02",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 7/13 · fato #12",
+  "slug": "hist12",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-02-hist12"
+  ]
+ },
+ {
+  "data": "2027-01-05",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #14",
+  "slug": "cur14",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-05-cur14"
+  ]
+ },
+ {
+  "data": "2027-01-07",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #7",
+  "slug": "meme07",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-07-meme07"
+  ]
+ },
+ {
+  "data": "2027-01-09",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 8/13 · fato #13",
+  "slug": "hist13",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-09-hist13"
+  ]
+ },
+ {
+  "data": "2027-01-12",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #12",
+  "slug": "cur12",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-12-cur12"
+  ]
+ },
+ {
+  "data": "2027-01-14",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #8",
+  "slug": "meme08",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-14-meme08"
+  ]
+ },
+ {
+  "data": "2027-01-16",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 9/13 · fato #14",
+  "slug": "hist14",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-16-hist14"
+  ]
+ },
+ {
+  "data": "2027-01-19",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #15",
+  "slug": "cur15",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-19-cur15"
+  ]
+ },
+ {
+  "data": "2027-01-21",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #9",
+  "slug": "meme09",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-21-meme09"
+  ]
+ },
+ {
+  "data": "2027-01-23",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 10/13 · fato #16",
+  "slug": "hist16",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-23-hist16"
+  ]
+ },
+ {
+  "data": "2027-01-26",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "Nesta data · fato #11",
+  "slug": "hist11",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-26-hist11"
+  ]
+ },
+ {
+  "data": "2027-01-28",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "carrossel",
+  "pauta": "Meme #10",
+  "slug": "meme10",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-28-meme10-1",
+   "2027-01-28-meme10-2",
+   "2027-01-28-meme10-3"
+  ]
+ },
+ {
+  "data": "2027-01-30",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 11/13 · fato #17",
+  "slug": "hist17",
+  "altura": 1350,
+  "arquivos": [
+   "2027-01-30-hist17"
+  ]
+ },
+ {
+  "data": "2027-02-02",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #16",
+  "slug": "cur16",
+  "altura": 1350,
+  "arquivos": [
+   "2027-02-02-cur16"
+  ]
+ },
+ {
+  "data": "2027-02-04",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #11",
+  "slug": "meme11",
+  "altura": 1350,
+  "arquivos": [
+   "2027-02-04-meme11"
+  ]
+ },
+ {
+  "data": "2027-02-06",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 12/13 · fato #18",
+  "slug": "hist18",
+  "altura": 1350,
+  "arquivos": [
+   "2027-02-06-hist18"
+  ]
+ },
+ {
+  "data": "2027-02-09",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #17",
+  "slug": "cur17",
+  "altura": 1350,
+  "arquivos": [
+   "2027-02-09-cur17"
+  ]
+ },
+ {
+  "data": "2027-02-11",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #12",
+  "slug": "meme12",
+  "altura": 1350,
+  "arquivos": [
+   "2027-02-11-meme12"
+  ]
+ },
+ {
+  "data": "2027-02-13",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "História 13/13 · fato #20",
+  "slug": "hist20",
+  "altura": 1350,
+  "arquivos": [
+   "2027-02-13-hist20"
+  ]
+ },
+ {
+  "data": "2027-02-16",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #18",
+  "slug": "cur18",
+  "altura": 1350,
+  "arquivos": [
+   "2027-02-16-cur18"
+  ]
+ },
+ {
+  "data": "2027-02-18",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #13",
+  "slug": "meme13",
+  "altura": 1350,
+  "arquivos": [
+   "2027-02-18-meme13"
+  ]
+ },
+ {
+  "data": "2027-02-23",
+  "hora": "12:30",
+  "tipo": "curiosidade",
+  "formato": "feed",
+  "pauta": "Curiosidade #19",
+  "slug": "cur19",
+  "altura": 1350,
+  "arquivos": [
+   "2027-02-23-cur19"
+  ]
+ },
+ {
+  "data": "2027-02-25",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #15",
+  "slug": "meme15",
+  "altura": 1350,
+  "arquivos": [
+   "2027-02-25-meme15"
+  ]
+ },
+ {
+  "data": "2027-03-04",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "Nesta data · fato #15",
+  "slug": "hist15",
+  "altura": 1350,
+  "arquivos": [
+   "2027-03-04-hist15"
+  ]
+ },
+ {
+  "data": "2027-03-11",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #16",
+  "slug": "meme16",
+  "altura": 1350,
+  "arquivos": [
+   "2027-03-11-meme16"
+  ]
+ },
+ {
+  "data": "2027-03-18",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "story-manual",
+  "pauta": "Meme #17 (story manual)",
+  "slug": "meme17",
+  "altura": 1920,
+  "arquivos": [
+   "2027-03-18-meme17"
+  ]
+ },
+ {
+  "data": "2027-03-24",
+  "hora": "12:30",
+  "tipo": "historia",
+  "formato": "feed",
+  "pauta": "Nesta data · fato #10",
+  "slug": "hist10",
+  "altura": 1350,
+  "arquivos": [
+   "2027-03-24-hist10"
+  ]
+ },
+ {
+  "data": "2027-03-25",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #18",
+  "slug": "meme18",
+  "altura": 1350,
+  "arquivos": [
+   "2027-03-25-meme18"
+  ]
+ },
+ {
+  "data": "2027-04-01",
+  "hora": "12:30",
+  "tipo": "meme",
+  "formato": "feed",
+  "pauta": "Meme #19",
+  "slug": "meme19",
+  "altura": 1350,
+  "arquivos": [
+   "2027-04-01-meme19"
+  ]
+ }
+]
