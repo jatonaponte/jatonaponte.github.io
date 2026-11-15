@@ -1,0 +1,87 @@
+# Renderiza o Reel semanal "A semana na Ponte" e salva em reels/<arquivo>.mp4 e .jpg.
+# Disparo automático (n8n):  POST https://api.github.com/repos/jatonaponte/jatonaponte.github.io/dispatches
+#   body: {"event_type":"reel-semana","client_payload":{"arquivo":"2026-11-23-semana","dados":{...}}}
+# Disparo manual (teste):    aba Actions › "Reel semanal" › Run workflow (dados vazio = modelos/semana/exemplo.json).
+name: Reel semanal
+
+on:
+  repository_dispatch:
+    types: [reel-semana]
+  workflow_dispatch:
+    inputs:
+      arquivo:
+        description: 'Nome do arquivo, sem extensão (ex.: 2026-11-23-semana)'
+        required: true
+        default: 'teste-semana'
+      dados:
+        description: 'JSON de entrada (vazio = exemplo.json)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+  pages: write
+
+concurrency:
+  group: reel-semana
+  cancel-in-progress: false
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    defaults:
+      run:
+        working-directory: modelos/semana
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Instala dependências
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install --with-deps chromium
+          sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
+
+      - name: Prepara os dados
+        env:
+          PAYLOAD: ${{ toJson(github.event.client_payload.dados) }}
+          INPUT: ${{ github.event.inputs.dados }}
+          ARQ: ${{ github.event.client_payload.arquivo || github.event.inputs.arquivo }}
+        run: |
+          node -e '
+            const fs = require("fs");
+            const arq = process.env.ARQ || "";
+            if (!/^[A-Za-z0-9-]{3,60}$/.test(arq)) { console.error("arquivo inválido: " + arq); process.exit(1); }
+            let d = null;
+            const p = process.env.PAYLOAD;
+            if (p && p !== "null" && p !== "\"\"") d = JSON.parse(p);
+            else if (process.env.INPUT && process.env.INPUT.trim()) d = JSON.parse(process.env.INPUT);
+            else d = JSON.parse(fs.readFileSync("exemplo.json", "utf8"));
+            if (typeof d === "string") d = JSON.parse(d);
+            if (!d.inicio || !d.fim || !Array.isArray(d.dias)) { console.error("JSON sem inicio, fim ou dias"); process.exit(1); }
+            fs.writeFileSync("/tmp/dados.json", JSON.stringify(d));
+            fs.appendFileSync(process.env.GITHUB_ENV, "ARQ=" + arq + "\n");
+            console.log("ok", arq, d.inicio, d.fim, d.dias.length, "dias");
+          '
+
+      - name: Renderiza
+        run: node render_semana.mjs /tmp/dados.json "../../reels/${ARQ}.mp4" "../../reels/${ARQ}.jpg"
+
+      - name: Salva no repositório
+        run: |
+          cd ../..
+          git config user.name "jatonaponte-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add "reels/${ARQ}.mp4" "reels/${ARQ}.jpg"
+          git commit -m "Reel semanal: ${ARQ}"
+          for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done
+
+      - name: Atualiza o GitHub Pages (o vídeo é lido por jatonaponte.github.io)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh api -X POST "repos/${GITHUB_REPOSITORY}/pages/builds" || echo "aviso - não consegui pedir o build do Pages"

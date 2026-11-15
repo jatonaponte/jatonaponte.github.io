@@ -1,0 +1,261 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<!-- Reel semanal "A semana na Ponte" (1080x1920, 15,5 s). Uso: semana.html?dados=<arquivo.json>
+     Entrada (JSON): { inicio, fim, dias: [{ data, rio_media, niteroi_media, rio_pior_min, rio_pior_hora, niteroi_pior_min, niteroi_pior_hora }] }
+     O modelo calcula sozinho o dia mais pesado de cada sentido e o pior momento da semana. Dias sem dado ficam vazios no gráfico. -->
+<link rel="stylesheet" href="node_modules/@fontsource/barlow/500.css">
+<link rel="stylesheet" href="node_modules/@fontsource/barlow/600.css">
+<link rel="stylesheet" href="node_modules/@fontsource/barlow/700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/barlow-condensed/700.css">
+<link rel="stylesheet" href="node_modules/@fontsource/barlow-condensed/800.css">
+<style>
+html,body{margin:0;width:1080px;height:1920px;overflow:hidden;background:#121619}
+#c{position:absolute;inset:0;width:1080px;height:1920px}
+#veu{position:absolute;inset:0;background:#121619;opacity:0}
+.ov{position:absolute;left:72px;right:72px;color:#F3F4F1;font-family:'Barlow',sans-serif;opacity:0}
+.cond{font-family:'Barlow Condensed',sans-serif}
+#title{top:258px;text-align:center}
+#title h1{margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:104px;letter-spacing:3px;color:#F5C518;line-height:1}
+#title p{margin:10px 0 0;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:58px;letter-spacing:2px;color:#F3F4F1}
+.kick{margin:0 0 34px;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:62px;letter-spacing:3px;color:#C3CAD0}
+.card{background:#1C2126;border-radius:28px;padding:34px 40px;margin-bottom:26px}
+.card h2{margin:0;display:flex;align-items:center;gap:16px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:44px;letter-spacing:2px}
+.card h2 span{width:36px;height:10px;border-radius:5px}
+.card .dia{margin:14px 0 0;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:130px;line-height:.95;letter-spacing:1px}
+.card .med{margin:8px 0 0;font-size:40px;font-weight:600;color:#C3CAD0}
+.card .med b{color:#F3F4F1}
+#pior .num{margin:0;font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:270px;line-height:.85;color:#F5C518;white-space:nowrap}
+#pior .num span{font-size:110px;color:#C3CAD0;margin-left:10px}
+#pior .onde{margin:36px 0 0;display:flex;align-items:center;gap:18px;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:62px;letter-spacing:2px}
+#pior .onde span{width:44px;height:12px;border-radius:6px}
+#pior .quando{margin:12px 0 0;font-size:52px;font-weight:600;color:#C3CAD0}
+.leg{display:flex;gap:34px;font-size:38px;font-weight:600;margin:-14px 0 26px} .leg span{display:flex;align-items:center;gap:12px} .leg i{display:block;width:44px;height:12px;border-radius:6px}
+.graf{position:relative;height:700px}
+.grupo{position:absolute;bottom:70px;width:120px;height:600px}
+.bar{position:absolute;bottom:0;width:48px;border-radius:10px 10px 0 0}
+.val{position:absolute;width:70px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:32px;color:#F3F4F1}
+.dl{position:absolute;bottom:0;width:120px;text-align:center;font-family:'Barlow Condensed',sans-serif;font-weight:700;font-size:40px;letter-spacing:2px;color:#C3CAD0}
+.vazio{position:absolute;bottom:14px;width:120px;text-align:center;font-size:40px;color:#5B646C}
+.base{position:absolute;left:0;right:0;bottom:68px;height:3px;background:#333B43}
+#end{top:1260px;text-align:center}
+#end p{margin:0}
+#end .n{font-family:'Barlow Condensed',sans-serif;font-weight:800;font-size:92px;letter-spacing:4px;line-height:1}
+#end .a{margin-top:14px;font-size:50px;font-weight:600;color:#F5C518}
+#end .f{margin-top:30px;font-size:40px;font-weight:600;color:#C3CAD0}
+#black{position:absolute;inset:0;background:#121619;pointer-events:none}
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<div id="veu"></div>
+<div id="title" class="ov"><h1>A SEMANA NA PONTE</h1><p id="periodo"></p></div>
+<div id="cenaA" class="ov" style="top:600px"><p class="kick">O DIA MAIS PESADO</p><div id="cardsA"></div></div>
+<div id="pior" class="ov" style="top:680px"><p class="kick">O PIOR MOMENTO DA SEMANA</p><p class="num" id="piorNum"></p><p class="onde" id="piorOnde"></p><p class="quando" id="piorQuando"></p></div>
+<div id="cenaC" class="ov" style="top:560px"><p class="kick">TEMPO MÉDIO POR DIA <span style="font-family:Barlow,sans-serif;font-weight:600;font-size:40px;letter-spacing:0">(min)</span></p>
+  <div class="leg"><span><i style="background:#FF8C42"></i>Rio</span><span><i style="background:#7CC4FF"></i>Niterói</span></div>
+  <div class="graf" id="graf"><div class="base"></div></div></div>
+<div id="end" class="ov"><p class="n">JÁ TÔ NA PONTE!</p><p class="a">@jatonaponte</p><p class="f">Siga para ver o trânsito em tempo real</p></div>
+<div id="black"></div>
+<script type="importmap">{"imports":{"three":"./node_modules/three/build/three.module.js"}}</script>
+<script type="module">
+import * as THREE from 'three';
+const arq = new URLSearchParams(location.search).get('dados') || 'exemplo.json';
+const D = await (await fetch(arq)).json();
+
+// ---------- dados ----------
+const LARANJA = '#FF8C42', AZUL = '#7CC4FF';
+const DIAS = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
+const dt = s => new Date(s + 'T12:00:00-03:00');
+const dm = s => { const d = dt(s); return d.getDate() + '/' + (d.getMonth() + 1); };
+const sem = s => DIAS[(dt(s).getDay() + 6) % 7];
+const n1 = v => (Math.round(v * 10) / 10).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
+const hh = h => { const [a, b] = String(h || '').split(':'); return a ? `${Number(a)}h${b || '00'}` : ''; };
+const porData = Object.fromEntries((D.dias || []).map(d => [d.data, d]));
+const semana = Array.from({ length: 7 }, (_, i) => { const d = dt(D.inicio); d.setDate(d.getDate() + i);
+  const iso = d.toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' }); return { data: iso, ...(porData[iso] || {}) }; });
+const comDado = k => semana.filter(d => d[k] != null);
+const maior = k => comDado(k).reduce((a, d) => (!a || d[k] > a[k]) ? d : a, null);
+const pesRio = maior('rio_media'), pesNit = maior('niteroi_media');
+const pr = maior('rio_pior_min'), pn = maior('niteroi_pior_min');
+const pior = (!pn || (pr && pr.rio_pior_min > pn.niteroi_pior_min))
+  ? { s: 'SENTIDO RIO', cor: LARANJA, min: pr.rio_pior_min, data: pr.data, hora: pr.rio_pior_hora }
+  : { s: 'SENTIDO NITERÓI', cor: AZUL, min: pn.niteroi_pior_min, data: pn.data, hora: pn.niteroi_pior_hora };
+
+document.getElementById('periodo').textContent = `${dm(D.inicio)} A ${dm(D.fim)}`;
+const card = (nome, cor, d, k) => d ? `<section class="card"><h2><span style="background:${cor}"></span>${nome}</h2>
+  <p class="dia">${sem(d.data)} ${dm(d.data)}</p><p class="med">média de <b>${n1(d[k])} min</b> para atravessar</p></section>` : '';
+document.getElementById('cardsA').innerHTML = card('SENTIDO RIO', LARANJA, pesRio, 'rio_media') + card('SENTIDO NITERÓI', AZUL, pesNit, 'niteroi_media');
+document.getElementById('piorNum').innerHTML = `${n1(pior.min)}<span>min</span>`;
+document.getElementById('piorOnde').innerHTML = `<span style="background:${pior.cor}"></span>${pior.s}`;
+document.getElementById('piorQuando').textContent = `${sem(pior.data).toLowerCase()} ${dm(pior.data)} às ${hh(pior.hora)}`;
+
+// gráfico de barras
+const vals = semana.flatMap(d => [d.rio_media, d.niteroi_media]).filter(v => v != null);
+const VMAX = Math.max(10, ...vals) * 1.12;
+const graf = document.getElementById('graf'); const barras = [];
+semana.forEach((d, i) => {
+  const g = document.createElement('div'); g.className = 'grupo'; g.style.left = (i * 133) + 'px'; graf.appendChild(g);
+  [['rio_media', LARANJA, 8], ['niteroi_media', AZUL, 62]].forEach(([k, cor, x]) => {
+    if (d[k] == null) return;
+    const h = 560 * d[k] / VMAX;
+    const b = document.createElement('div'); b.className = 'bar'; b.style.left = x + 'px'; b.style.background = cor; g.appendChild(b);
+    const v = document.createElement('div'); v.className = 'val'; v.style.left = (x - 11) + 'px'; v.textContent = n1(d[k]); g.appendChild(v);
+    barras.push({ b, v, h, i });
+  });
+  const l = document.createElement('div'); l.className = 'dl'; l.style.left = (i * 133) + 'px'; l.textContent = sem(d.data); graf.appendChild(l);
+  if (d.rio_media == null && d.niteroi_media == null) { const z = document.createElement('div'); z.className = 'vazio'; z.style.left = (i * 133) + 'px'; z.style.bottom = '84px'; z.textContent = '—'; graf.appendChild(z); }
+});
+
+// ---------- logo 3D (o mesmo dos Reels "Você sabia?") ----------
+const W = 1080, H = 1920;
+const renderer = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, stencil: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(1);
+renderer.setSize(W, H, false);
+const scene = new THREE.Scene();
+scene.background = new THREE.Color('#121619');
+const cam = new THREE.PerspectiveCamera(38, W / H, 0.1, 100);
+
+scene.add(new THREE.AmbientLight(0xffffff, 1.1));
+const key = new THREE.DirectionalLight(0xffffff, 1.9); key.position.set(2.5, 4, 5); scene.add(key);
+const fill = new THREE.DirectionalLight(0xffffff, 0.6); fill.position.set(-4, 1, 3); scene.add(fill);
+
+const logo = new THREE.Group(); scene.add(logo);
+const std = (c, o = {}) => new THREE.MeshStandardMaterial(Object.assign({ color: c, roughness: 0.65, metalness: 0.05 }, o));
+
+// disco + anel
+const face = new THREE.Mesh(new THREE.CircleGeometry(1, 128), std('#1C2126', {
+  stencilWrite: true, stencilRef: 1, stencilFunc: THREE.AlwaysStencilFunc, stencilZPass: THREE.ReplaceStencilOp, depthWrite: false }));
+face.position.z = 0.001; face.renderOrder = 0; logo.add(face);
+const ring = new THREE.Mesh(new THREE.TorusGeometry(1.0, 0.045, 24, 160), std('#4A535B', { roughness: 0.4, metalness: 0.3, depthTest: false }));
+ring.position.z = 0.02; ring.renderOrder = 5; logo.add(ring);
+
+const clipped = (c, o = {}) => std(c, Object.assign({ stencilWrite: true, stencilRef: 1, stencilFunc: THREE.EqualStencilFunc,
+  stencilFail: THREE.KeepStencilOp, stencilZFail: THREE.KeepStencilOp, stencilZPass: THREE.KeepStencilOp }, o));
+
+// eixo das pistas: reta em diagonal (perto/esquerda -> longe/direita), com o vão central simétrico
+const DIR = new THREE.Vector3(0.62, 0, -0.78).normalize();
+const LEN = 4.4, BASEY = -0.12, HUMP = 0.30, CEN = 0.5;
+const deckY = u => BASEY + HUMP * Math.exp(-Math.pow((u - CEN) / 0.17, 2));
+const pt = u => new THREE.Vector3(0, deckY(u), 0.05).addScaledVector(DIR, (u - CEN) * LEN);
+const N = 240;
+const P = Array.from({ length: N + 1 }, (_, i) => pt(i / N));
+const UP = new THREE.Vector3(0, 1, 0);
+const frames = P.map((p, i) => {
+  const a = P[Math.max(0, i - 1)], b = P[Math.min(N, i + 1)];
+  const T = b.clone().sub(a).normalize();
+  const S = new THREE.Vector3().crossVectors(T, UP).normalize();
+  const Nn = new THREE.Vector3().crossVectors(S, T).normalize();
+  return { p, T, S, N: Nn };
+});
+const TH = 0.04, LW = 0.15;
+const at = (i, o, d) => frames[i].p.clone().addScaledVector(frames[i].S, o).addScaledVector(frames[i].N, d);
+
+function strip(fa, fb, filter) {
+  const pos = []; const counts = [0];
+  for (let i = 0; i < N; i++) {
+    if (!filter || filter(i)) {
+      const a0 = fa(i), b0 = fb(i), a1 = fa(i + 1), b1 = fb(i + 1);
+      for (const v of [a0, b0, a1, b0, b1, a1]) pos.push(v.x, v.y, v.z);
+    }
+    counts.push(pos.length / 3);
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3));
+  g.computeVertexNormals();
+  return { g, counts };
+}
+const growers = [];
+function addStrip(fa, fb, mat, filter) {
+  const { g, counts } = strip(fa, fb, filter);
+  mat.side = THREE.DoubleSide;
+  const m = new THREE.Mesh(g, mat); m.renderOrder = 1; logo.add(m);
+  growers.push({ m, counts });
+}
+function lane(o1, o2, top, side, darkSide) {
+  const c = typeof top === 'string' ? top : '#F3F4F1';
+  addStrip(i => at(i, o1, 0), i => at(i, o2, 0), clipped(c, { emissive: c, emissiveIntensity: 0.28 }));
+  addStrip(i => at(i, o2, 0), i => at(i, o2, -TH), clipped(darkSide));
+  addStrip(i => at(i, o1, 0), i => at(i, o1, -TH), clipped(side));
+  addStrip(i => at(i, o1, -TH), i => at(i, o2, -TH), clipped(darkSide));
+  const mid = (o1 + o2) / 2;
+  addStrip(i => at(i, mid - 0.006, 0.003), i => at(i, mid + 0.006, 0.003), clipped('#121619', { roughness: 1 }), i => Math.floor(i / 4) % 2 === 0);
+}
+lane(-LW, 0, std('#F3F4F1'), '#A7AFB6', '#8A939B');   // pista branca (atrás)
+lane(0, LW, '#F5C518', '#B8920F', '#B8920F', true);     // pista amarela (frente)
+
+// pilares: colunas duplas sobre sapata
+const pillars = [];
+const box = (w, h, d, c) => new THREE.Mesh(new THREE.BoxGeometry(w, h, d), clipped(c));
+function pillar(u) {
+  const i = Math.round(u * N), f = frames[i];
+  const g = new THREE.Group(); g.renderOrder = 1;
+  const footY = -0.62, top = f.p.y - TH - 0.01, h = top - (footY + 0.035);
+  const foot = box(0.3, 0.07, 0.42, '#7A838B'); foot.position.set(f.p.x, footY, f.p.z); foot.rotation.y = Math.atan2(-DIR.z, DIR.x); foot.renderOrder = 1; g.add(foot);
+  for (const o of [-0.08, 0.08]) {
+    const col = box(0.06, h, 0.06, '#8A939B');
+    col.geometry.translate(0, h / 2, 0);
+    col.position.set(f.p.x, footY + 0.035, f.p.z).addScaledVector(f.S, o); col.renderOrder = 1;
+    g.add(col); pillars.push(col);
+  }
+  logo.add(g);
+  return f.p.clone();
+}
+const pA = pillar(CEN - 0.095), pB = pillar(CEN + 0.095);
+
+
+// ---------- tempo ----------
+const cl = (v, a = 0, b = 1) => Math.min(b, Math.max(a, v));
+const ease = x => x < 0.5 ? 4 * x * x * x : 1 - Math.pow(-2 * x + 2, 3) / 2;
+const seg = (t, a, b) => ease(cl((t - a) / (b - a)));
+const fade = (t, a, b, c, d) => Math.min(seg(t, a, b), 1 - seg(t, c, d));
+const KF = [
+  { t: 0.0, az: -0.70, el: 0.50, d: 7.6, ty: -0.40, tx: 0 },
+  { t: 3.0, az: -0.38, el: 0.44, d: 7.2, ty: -0.40, tx: 0 },
+  { t: 6.4, az: 0.10, el: 0.40, d: 6.4, ty: -0.34, tx: 0.03 },
+  { t: 10.0, az: 0.26, el: 0.38, d: 6.7, ty: -0.38, tx: 0 },
+  { t: 13.2, az: 0.0, el: 0.36, d: 7.2, ty: -0.42, tx: 0 },
+  { t: 99, az: 0.0, el: 0.36, d: 7.2, ty: -0.42, tx: 0 },
+];
+function camAt(t) {
+  let k = 0; while (KF[k + 1].t < t) k++;
+  const a = KF[k], b = KF[k + 1], u = seg(t, a.t, b.t);
+  const L = (p) => a[p] + (b[p] - a[p]) * u;
+  const az = L('az'), el = L('el'), d = L('d');
+  const tgt = new THREE.Vector3(L('tx'), L('ty'), 0.1);
+  cam.position.set(tgt.x + d * Math.sin(az) * Math.cos(el), tgt.y + d * Math.sin(el), tgt.z + d * Math.cos(az) * Math.cos(el));
+  cam.lookAt(tgt);
+}
+
+KF.forEach(k => { k.ty += 0.2; k.d *= 1.06; }); // logo um pouco menor e mais baixo, abaixo do título de duas linhas
+const $ = id => document.getElementById(id);
+const op = (id, v, dy = 0) => { const e = $(id); e.style.opacity = v; e.style.transform = `translateY(${(1 - v) * dy}px)`; };
+
+window.renderAt = (t) => {
+  camAt(t);
+  const s = 0.86 + 0.14 * seg(t, 0, 1.2);
+  logo.scale.setScalar(s);
+  logo.rotation.y = -0.5 * (1 - seg(t, 0, 1.6));
+  const g = seg(t, 0.6, 2.8);
+  for (const { m, counts } of growers) m.geometry.setDrawRange(0, counts[Math.round(g * N)]);
+  const pr = seg(t, 1.5, 2.9);
+  for (const c of pillars) { c.scale.y = Math.max(0.001, pr); c.visible = pr > 0.002; }
+  // o logo aparece na abertura, some durante os dados e volta no encerramento
+  $('veu').style.opacity = Math.min(seg(t, 3.0, 3.5), 1 - seg(t, 12.7, 13.3));
+  $('black').style.opacity = 1 - seg(t, 0, 0.5);
+  op('title', fade(t, 0.3, 0.9, 12.3, 12.7), -30);
+  op('cenaA', fade(t, 3.4, 3.9, 6.3, 6.7), 40);
+  op('pior', fade(t, 6.7, 7.2, 9.3, 9.7), 40);
+  op('cenaC', fade(t, 9.7, 10.1, 12.3, 12.7), 40);
+  for (const { b, v, h, i } of barras) {
+    const k = seg(t, 10.0 + i * 0.12, 10.9 + i * 0.12);
+    b.style.height = (h * k) + 'px'; v.style.bottom = (h * k + 8) + 'px'; v.style.opacity = k > 0.95 ? 1 : 0;
+  }
+  op('end', seg(t, 13.0, 13.6), 40);
+  renderer.render(scene, cam);
+};
+window.ready = document.fonts.ready.then(() => { window.renderAt(0); return true; });
+</script>
+</body>
+</html>
