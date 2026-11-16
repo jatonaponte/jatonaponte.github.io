@@ -1,16 +1,23 @@
 // Renderiza o Reel "A semana na Ponte" a partir de um JSON de dados.
-// Uso: node render_semana.mjs <dados.json> <saida.mp4> <capa.jpg>
-// Precisa de: npm install (three, fontes, playwright), npx playwright install chromium, ffmpeg no PATH.
+// Uso (da raiz do repositório): node modelos/semana/render-semana.mjs semana/AAAA-MM-DD.json [saida.mp4] [capa.jpg]
+//   Sem saída explícita, grava reels/semana-AAAA-MM-DD.mp4 e reels/semana-AAAA-MM-DD.jpg na raiz do repositório.
+// Precisa de: npm install (three, fontes, playwright) em modelos/semana, npx playwright install chromium e ffmpeg no PATH.
 import { chromium } from 'playwright';
 import { spawn } from 'node:child_process';
 import { createServer } from 'node:http';
-import { readFile, copyFile, rename, rm } from 'node:fs/promises';
-import { extname, join, resolve, dirname } from 'node:path';
+import { readFile, copyFile, rename, rm, mkdir } from 'node:fs/promises';
+import { extname, join, resolve, dirname, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const AQUI = dirname(fileURLToPath(import.meta.url));
-const [dadosArq, saida, capa] = process.argv.slice(2);
-if (!dadosArq || !saida || !capa) { console.error('uso: node render_semana.mjs <dados.json> <saida.mp4> <capa.jpg>'); process.exit(2); }
+const RAIZ = resolve(AQUI, '..', '..');
+const args = process.argv.slice(2);
+const dadosArq = args[0];
+if (!dadosArq) { console.error('uso: node modelos/semana/render-semana.mjs semana/AAAA-MM-DD.json [saida.mp4] [capa.jpg]'); process.exit(2); }
+const base = 'semana-' + basename(dadosArq, '.json');
+const saida = resolve(args[1] || join(RAIZ, 'reels', base + '.mp4'));
+const capa = resolve(args[2] || join(RAIZ, 'reels', base + '.jpg'));
+await mkdir(dirname(saida), { recursive: true });
 const FPS = 30, DUR = 15.5, T_CAPA = 2.9;
 
 // copia os dados para dentro da pasta servida

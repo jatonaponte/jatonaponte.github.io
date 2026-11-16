@@ -65,6 +65,9 @@ const arq = new URLSearchParams(location.search).get('dados') || 'exemplo.json';
 const D = await (await fetch(arq)).json();
 
 // ---------- dados ----------
+// Aceita dois formatos de entrada:
+//  (a) do fluxo: { semana:{inicio,fim}, sentidos:{ Rio:{dias[7],dia_mais_pesado,pior_momento}, "Niterói":{...} } }
+//  (b) simples:  { inicio, fim, dias:[{data,rio_media,niteroi_media,rio_pior_min,rio_pior_hora,niteroi_pior_min,niteroi_pior_hora}] }
 const LARANJA = '#FF8C42', AZUL = '#7CC4FF';
 const DIAS = ['SEG', 'TER', 'QUA', 'QUI', 'SEX', 'SÁB', 'DOM'];
 const dt = s => new Date(s + 'T12:00:00-03:00');
@@ -72,24 +75,49 @@ const dm = s => { const d = dt(s); return d.getDate() + '/' + (d.getMonth() + 1)
 const sem = s => DIAS[(dt(s).getDay() + 6) % 7];
 const n1 = v => (Math.round(v * 10) / 10).toLocaleString('pt-BR', { maximumFractionDigits: 1 });
 const hh = h => { const [a, b] = String(h || '').split(':'); return a ? `${Number(a)}h${b || '00'}` : ''; };
-const porData = Object.fromEntries((D.dias || []).map(d => [d.data, d]));
-const semana = Array.from({ length: 7 }, (_, i) => { const d = dt(D.inicio); d.setDate(d.getDate() + i);
+const corStatus = st => { st = String(st || ''); return st.startsWith('vermelho') ? '#FF5D52' : st.startsWith('amarelo') ? '#F5A524' : st.startsWith('verde') ? '#4CD98A' : '#F5C518'; };
+const num = v => (v == null || v === '' || isNaN(Number(v))) ? null : Number(v);
+
+let INICIO, FIM, porData = {}, pesRio = null, pesNit = null, pior = null;
+if (D.sentidos) {
+  const R = D.sentidos['Rio'] || {}, NI = D.sentidos['Niterói'] || D.sentidos['Niteroi'] || {};
+  INICIO = D.semana.inicio; FIM = D.semana.fim;
+  for (const d of R.dias || []) (porData[d.data] ||= { data: d.data }).rio_media = num(d.media_min);
+  for (const d of NI.dias || []) (porData[d.data] ||= { data: d.data }).niteroi_media = num(d.media_min);
+  if (R.dia_mais_pesado && num(R.dia_mais_pesado.media_min) != null) pesRio = { data: R.dia_mais_pesado.data, rio_media: num(R.dia_mais_pesado.media_min) };
+  if (NI.dia_mais_pesado && num(NI.dia_mais_pesado.media_min) != null) pesNit = { data: NI.dia_mais_pesado.data, niteroi_media: num(NI.dia_mais_pesado.media_min) };
+  const pr = R.pior_momento, pn = NI.pior_momento;
+  const vr = pr ? num(pr.minutos) : null, vn = pn ? num(pn.minutos) : null;
+  if (vr != null || vn != null) {
+    const ehRio = vn == null || (vr != null && vr > vn);
+    const p = ehRio ? pr : pn;
+    pior = { s: ehRio ? 'SENTIDO RIO' : 'SENTIDO NITERÓI', cor: ehRio ? LARANJA : AZUL, min: num(p.minutos), data: p.data, hora: p.hora, corNum: corStatus(p.status) };
+  }
+} else {
+  INICIO = D.inicio; FIM = D.fim;
+  porData = Object.fromEntries((D.dias || []).map(d => [d.data, d]));
+}
+const semana = Array.from({ length: 7 }, (_, i) => { const d = dt(INICIO); d.setDate(d.getDate() + i);
   const iso = d.toLocaleDateString('sv-SE', { timeZone: 'America/Sao_Paulo' }); return { data: iso, ...(porData[iso] || {}) }; });
 const comDado = k => semana.filter(d => d[k] != null);
 const maior = k => comDado(k).reduce((a, d) => (!a || d[k] > a[k]) ? d : a, null);
-const pesRio = maior('rio_media'), pesNit = maior('niteroi_media');
-const pr = maior('rio_pior_min'), pn = maior('niteroi_pior_min');
-const pior = (!pn || (pr && pr.rio_pior_min > pn.niteroi_pior_min))
-  ? { s: 'SENTIDO RIO', cor: LARANJA, min: pr.rio_pior_min, data: pr.data, hora: pr.rio_pior_hora }
-  : { s: 'SENTIDO NITERÓI', cor: AZUL, min: pn.niteroi_pior_min, data: pn.data, hora: pn.niteroi_pior_hora };
+pesRio = pesRio || maior('rio_media'); pesNit = pesNit || maior('niteroi_media');
+if (!pior) {
+  const pr = maior('rio_pior_min'), pn = maior('niteroi_pior_min');
+  if (pr || pn) pior = (!pn || (pr && pr.rio_pior_min > pn.niteroi_pior_min))
+    ? { s: 'SENTIDO RIO', cor: LARANJA, min: pr.rio_pior_min, data: pr.data, hora: pr.rio_pior_hora, corNum: '#F5C518' }
+    : { s: 'SENTIDO NITERÓI', cor: AZUL, min: pn.niteroi_pior_min, data: pn.data, hora: pn.niteroi_pior_hora, corNum: '#F5C518' };
+}
+const D2 = { inicio: INICIO, fim: FIM };
 
-document.getElementById('periodo').textContent = `${dm(D.inicio)} A ${dm(D.fim)}`;
+document.getElementById('periodo').textContent = `${dm(D2.inicio)} A ${dm(D2.fim)}`;
 const card = (nome, cor, d, k) => d ? `<section class="card"><h2><span style="background:${cor}"></span>${nome}</h2>
   <p class="dia">${sem(d.data)} ${dm(d.data)}</p><p class="med">média de <b>${n1(d[k])} min</b> para atravessar</p></section>` : '';
 document.getElementById('cardsA').innerHTML = card('SENTIDO RIO', LARANJA, pesRio, 'rio_media') + card('SENTIDO NITERÓI', AZUL, pesNit, 'niteroi_media');
-document.getElementById('piorNum').innerHTML = `${n1(pior.min)}<span>min</span>`;
-document.getElementById('piorOnde').innerHTML = `<span style="background:${pior.cor}"></span>${pior.s}`;
-document.getElementById('piorQuando').textContent = `${sem(pior.data).toLowerCase()} ${dm(pior.data)} às ${hh(pior.hora)}`;
+document.getElementById('piorNum').innerHTML = pior ? `${n1(pior.min)}<span>min</span>` : '—';
+if (pior) document.getElementById('piorNum').style.color = pior.corNum;
+document.getElementById('piorOnde').innerHTML = pior ? `<span style="background:${pior.cor}"></span>${pior.s}` : '';
+document.getElementById('piorQuando').textContent = pior ? `${sem(pior.data).toLowerCase()} ${dm(pior.data)} às ${hh(pior.hora)}` : '';
 
 // gráfico de barras
 const vals = semana.flatMap(d => [d.rio_media, d.niteroi_media]).filter(v => v != null);

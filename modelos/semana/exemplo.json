@@ -1,11 +1,38 @@
 {
-  "inicio": "2026-11-09",
-  "fim": "2026-11-15",
-  "dias": [
-    {"data": "2026-11-10", "rio_media": 6.8,  "niteroi_media": 11.9, "rio_pior_min": 9,    "rio_pior_hora": "23:48", "niteroi_pior_min": 23,   "niteroi_pior_hora": "18:03"},
-    {"data": "2026-11-11", "rio_media": 12.6, "niteroi_media": 18.7, "rio_pior_min": 41.3, "rio_pior_hora": "10:18", "niteroi_pior_min": 42.1, "niteroi_pior_hora": "16:18"},
-    {"data": "2026-11-12", "rio_media": 10.9, "niteroi_media": 15.0, "rio_pior_min": 17.6, "rio_pior_hora": "07:03", "niteroi_pior_min": 38.6, "niteroi_pior_hora": "16:18"},
-    {"data": "2026-11-13", "rio_media": 10.6, "niteroi_media": 20.1, "rio_pior_min": 17.9, "rio_pior_hora": "14:03", "niteroi_pior_min": 48.5, "niteroi_pior_hora": "19:03"},
-    {"data": "2026-11-14", "rio_media": 10.1, "niteroi_media": 14.0, "rio_pior_min": 16.3, "rio_pior_hora": "22:18", "niteroi_pior_min": 21.3, "niteroi_pior_hora": "09:48"}
-  ]
+  "semana": { "inicio": "2026-11-09", "fim": "2026-11-15", "rotulo": "9 a 15/11" },
+  "sentidos": {
+    "Rio": {
+      "media_min": 10.4,
+      "dias": [
+        { "data": "2026-11-09", "rotulo": "seg", "media_min": null },
+        { "data": "2026-11-10", "rotulo": "ter", "media_min": 6.8 },
+        { "data": "2026-11-11", "rotulo": "qua", "media_min": 12.6 },
+        { "data": "2026-11-12", "rotulo": "qui", "media_min": 10.9 },
+        { "data": "2026-11-13", "rotulo": "sex", "media_min": 10.6 },
+        { "data": "2026-11-14", "rotulo": "sáb", "media_min": 10.1 },
+        { "data": "2026-11-15", "rotulo": "dom", "media_min": null }
+      ],
+      "dia_mais_pesado": { "data": "2026-11-11", "rotulo": "qua", "media_min": 12.6 },
+      "pior_momento": { "data": "2026-11-11", "rotulo": "qua", "hora": "10:18", "minutos": 41.3, "status": "vermelho" },
+      "melhor_dia": { "data": "2026-11-10", "rotulo": "ter", "media_min": 6.8 }
+    },
+    "Niterói": {
+      "media_min": 15.9,
+      "dias": [
+        { "data": "2026-11-09", "rotulo": "seg", "media_min": null },
+        { "data": "2026-11-10", "rotulo": "ter", "media_min": 11.9 },
+        { "data": "2026-11-11", "rotulo": "qua", "media_min": 18.7 },
+        { "data": "2026-11-12", "rotulo": "qui", "media_min": 15.0 },
+        { "data": "2026-11-13", "rotulo": "sex", "media_min": 20.1 },
+        { "data": "2026-11-14", "rotulo": "sáb", "media_min": 14.0 },
+        { "data": "2026-11-15", "rotulo": "dom", "media_min": null }
+      ],
+      "dia_mais_pesado": { "data": "2026-11-13", "rotulo": "sex", "media_min": 20.1 },
+      "pior_momento": { "data": "2026-11-13", "rotulo": "sex", "hora": "19:03", "minutos": 48.5, "status": "vermelho" },
+      "melhor_dia": { "data": "2026-11-10", "rotulo": "ter", "media_min": 11.9 }
+    }
+  },
+  "dias_com_chuva": 3,
+  "rajada_max_kmh": 45.0,
+  "leituras": 670
 }

@@ -1,22 +1,22 @@
-# Renderiza o Reel semanal "A semana na Ponte" e salva em reels/<arquivo>.mp4 e .jpg.
-# Disparo automático (n8n):  POST https://api.github.com/repos/jatonaponte/jatonaponte.github.io/dispatches
-#   body: {"event_type":"reel-semana","client_payload":{"arquivo":"2026-11-23-semana","dados":{...}}}
-# Disparo manual (teste):    aba Actions › "Reel semanal" › Run workflow (dados vazio = modelos/semana/exemplo.json).
+# Renderiza o Reel semanal "A semana na Ponte".
+# Automático: quando o n8n grava (push) semana/AAAA-MM-DD.json, gera reels/semana-AAAA-MM-DD.mp4 e .jpg (capa) e faz commit.
+# Manual (teste): aba Actions › "Reel semanal" › Run workflow. Por padrão renderiza modelos/semana/exemplo.json em reels/semana-teste.*
 name: Reel semanal
 
 on:
-  repository_dispatch:
-    types: [reel-semana]
+  push:
+    branches: [main]
+    paths: ['semana/*.json']
   workflow_dispatch:
     inputs:
-      arquivo:
-        description: 'Nome do arquivo, sem extensão (ex.: 2026-11-23-semana)'
+      json:
+        description: 'Arquivo de dados (caminho no repositório)'
         required: true
-        default: 'teste-semana'
-      dados:
-        description: 'JSON de entrada (vazio = exemplo.json)'
-        required: false
-        default: ''
+        default: 'modelos/semana/exemplo.json'
+      nome:
+        description: 'Nome de saída, sem extensão (vai para reels/)'
+        required: true
+        default: 'semana-teste'
 
 permissions:
   contents: write
@@ -29,58 +29,65 @@ concurrency:
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
-    defaults:
-      run:
-        working-directory: modelos/semana
+    timeout-minutes: 40
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
+      - name: Lista o que renderizar
+        env:
+          EVENTO: ${{ github.event_name }}
+          IN_JSON: ${{ github.event.inputs.json }}
+          IN_NOME: ${{ github.event.inputs.nome }}
+        run: |
+          : > /tmp/fila.txt
+          if [ "$EVENTO" = "workflow_dispatch" ]; then
+            echo "$IN_NOME" | grep -Eq '^[A-Za-z0-9-]{3,60}$' || { echo "nome inválido"; exit 1; }
+            test -f "$IN_JSON" || { echo "arquivo não encontrado: $IN_JSON"; exit 1; }
+            echo "$IN_JSON reels/$IN_NOME.mp4 reels/$IN_NOME.jpg" >> /tmp/fila.txt
+          else
+            git diff --name-only --diff-filter=AM HEAD^ HEAD -- 'semana/*.json' | while read -r f; do
+              b=$(basename "$f" .json)
+              echo "$b" | grep -Eq '^[0-9]{4}-[0-9]{2}-[0-9]{2}$' || { echo "ignorado: $f"; continue; }
+              echo "$f reels/semana-$b.mp4 reels/semana-$b.jpg" >> /tmp/fila.txt
+            done
+          fi
+          echo "Fila:"; cat /tmp/fila.txt
+          test -s /tmp/fila.txt || echo "VAZIO=1" >> "$GITHUB_ENV"
 
       - uses: actions/setup-node@v4
+        if: env.VAZIO != '1'
         with:
           node-version: 22
 
       - name: Instala dependências
+        if: env.VAZIO != '1'
+        working-directory: modelos/semana
         run: |
-          npm install --no-audit --no-fund
+          npm ci --no-audit --no-fund || npm install --no-audit --no-fund
           npx playwright install --with-deps chromium
           sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg
 
-      - name: Prepara os dados
-        env:
-          PAYLOAD: ${{ toJson(github.event.client_payload.dados) }}
-          INPUT: ${{ github.event.inputs.dados }}
-          ARQ: ${{ github.event.client_payload.arquivo || github.event.inputs.arquivo }}
-        run: |
-          node -e '
-            const fs = require("fs");
-            const arq = process.env.ARQ || "";
-            if (!/^[A-Za-z0-9-]{3,60}$/.test(arq)) { console.error("arquivo inválido: " + arq); process.exit(1); }
-            let d = null;
-            const p = process.env.PAYLOAD;
-            if (p && p !== "null" && p !== "\"\"") d = JSON.parse(p);
-            else if (process.env.INPUT && process.env.INPUT.trim()) d = JSON.parse(process.env.INPUT);
-            else d = JSON.parse(fs.readFileSync("exemplo.json", "utf8"));
-            if (typeof d === "string") d = JSON.parse(d);
-            if (!d.inicio || !d.fim || !Array.isArray(d.dias)) { console.error("JSON sem inicio, fim ou dias"); process.exit(1); }
-            fs.writeFileSync("/tmp/dados.json", JSON.stringify(d));
-            fs.appendFileSync(process.env.GITHUB_ENV, "ARQ=" + arq + "\n");
-            console.log("ok", arq, d.inicio, d.fim, d.dias.length, "dias");
-          '
-
       - name: Renderiza
-        run: node render_semana.mjs /tmp/dados.json "../../reels/${ARQ}.mp4" "../../reels/${ARQ}.jpg"
+        if: env.VAZIO != '1'
+        run: |
+          while read -r json mp4 jpg; do
+            node -e 'const d=JSON.parse(require("fs").readFileSync(process.argv[1],"utf8")); if(!(d.sentidos||d.dias)) {console.error("JSON sem sentidos/dias"); process.exit(1)}' "$json"
+            node modelos/semana/render-semana.mjs "$json" "$mp4" "$jpg"
+          done < /tmp/fila.txt
 
       - name: Salva no repositório
+        if: env.VAZIO != '1'
         run: |
-          cd ../..
           git config user.name "jatonaponte-bot"
           git config user.email "actions@users.noreply.github.com"
-          git add "reels/${ARQ}.mp4" "reels/${ARQ}.jpg"
-          git commit -m "Reel semanal: ${ARQ}"
+          git add reels/
+          git commit -m "Reel semanal: $(cut -d' ' -f2 /tmp/fila.txt | xargs)" || exit 0
           for i in 1 2 3; do git pull --rebase -q && git push && break; sleep 5; done
 
       - name: Atualiza o GitHub Pages (o vídeo é lido por jatonaponte.github.io)
+        if: env.VAZIO != '1'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
