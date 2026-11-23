@@ -18,7 +18,7 @@ const base = 'semana-' + basename(dadosArq, '.json');
 const saida = resolve(args[1] || join(RAIZ, 'reels', base + '.mp4'));
 const capa = resolve(args[2] || join(RAIZ, 'reels', base + '.jpg'));
 await mkdir(dirname(saida), { recursive: true });
-const FPS = 30, DUR = 15.5, T_CAPA = 2.9;
+const FPS = 30, T_CAPA = 3.4; // capa: logo montado com o título (tempo de saída)
 
 // copia os dados para dentro da pasta servida
 await copyFile(resolve(dadosArq), join(AQUI, '_dados.json'));
@@ -47,6 +47,9 @@ await page.goto(url);
 await page.waitForFunction(() => window.ready);
 await page.evaluate(() => window.ready);
 const shot = async t => { await page.evaluate(t => window.renderAt(t), t); return page.screenshot({ type: 'jpeg', quality: 92, timeout: 120000 }); };
+
+// duração vem do modelo (ritmo definido em semana.html)
+const DUR = await page.evaluate(() => window.DUR || 15.5);
 
 // capa
 const { writeFile } = await import('node:fs/promises');

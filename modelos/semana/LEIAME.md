@@ -1,13 +1,13 @@
 # Reel "A semana na Ponte"
 
-Reel vertical (1080×1920, 30 fps, 15,5 s, com a trilha dos Reels "Você sabia?") gerado toda semana a partir de dados, sem edição manual.
+Reel vertical (1080×1920, 30 fps, 27 s, com a trilha dos Reels "Você sabia?") gerado toda semana a partir de dados, sem edição manual.
 
 ## Cenas
-1. **0–3 s, abertura:** o logo 3D se monta, com "A SEMANA NA PONTE · DD/MM A DD/MM".
-2. **3,4–6,7 s, O DIA MAIS PESADO:** um cartão por sentido, com o dia e a média do tempo de travessia.
-3. **6,7–9,7 s, O PIOR MOMENTO DA SEMANA:** o maior tempo de travessia, com o sentido, o dia e a hora.
-4. **9,7–12,7 s, TEMPO MÉDIO POR DIA (min):** barras animadas de segunda a domingo (Rio #FF8C42, Niterói #7CC4FF). Dia sem dado fica com "—".
-5. **12,7–15,5 s, encerramento:** o logo volta, com "JÁ TÔ NA PONTE!", "@jatonaponte" e "Siga para ver o trânsito em tempo real".
+1. **0–5 s, abertura:** o logo 3D se monta, com "A SEMANA NA PONTE · DD/MM A DD/MM".
+2. **5–11 s, O DIA MAIS PESADO:** um cartão por sentido, com o dia e a média do tempo de travessia.
+3. **11–16,5 s, O PIOR MOMENTO DA SEMANA:** o maior tempo de travessia, com o sentido, o dia e a hora.
+4. **16,5–22,5 s, TEMPO MÉDIO POR DIA (min):** barras animadas de segunda a domingo (Rio #FF8C42, Niterói #7CC4FF). Dia sem dado fica com "—".
+5. **22,5–27 s, encerramento:** o logo volta, com "JÁ TÔ NA PONTE!", "@jatonaponte" e "Siga para ver o trânsito em tempo real".
 
 ## Entrada (JSON)
 O formato oficial é o de `claude/ponte-codigo/semana-reel-dados.md` (o mesmo de `exemplo.json`):
