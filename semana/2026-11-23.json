@@ -1,0 +1,126 @@
+{
+  "semana": {
+    "inicio": "2026-11-16",
+    "fim": "2026-11-22",
+    "rotulo": "16 a 22/11"
+  },
+  "sentidos": {
+    "Rio": {
+      "media_min": 11.5,
+      "dias": [
+        {
+          "data": "2026-11-16",
+          "rotulo": "seg",
+          "media_min": 12.2
+        },
+        {
+          "data": "2026-11-17",
+          "rotulo": "ter",
+          "media_min": 12.2
+        },
+        {
+          "data": "2026-11-18",
+          "rotulo": "qua",
+          "media_min": 12.3
+        },
+        {
+          "data": "2026-11-19",
+          "rotulo": "qui",
+          "media_min": 11.7
+        },
+        {
+          "data": "2026-11-20",
+          "rotulo": "sex",
+          "media_min": 10.2
+        },
+        {
+          "data": "2026-11-21",
+          "rotulo": "sáb",
+          "media_min": 10
+        },
+        {
+          "data": "2026-11-22",
+          "rotulo": "dom",
+          "media_min": 11.7
+        }
+      ],
+      "dia_mais_pesado": {
+        "data": "2026-11-18",
+        "rotulo": "qua",
+        "media_min": 12.3
+      },
+      "pior_momento": {
+        "data": "2026-11-16",
+        "rotulo": "seg",
+        "hora": "00:03",
+        "minutos": 46.9,
+        "status": "vermelho"
+      },
+      "melhor_dia": {
+        "data": "2026-11-21",
+        "rotulo": "sáb",
+        "media_min": 10
+      }
+    },
+    "Niterói": {
+      "media_min": 19.4,
+      "dias": [
+        {
+          "data": "2026-11-16",
+          "rotulo": "seg",
+          "media_min": 19.2
+        },
+        {
+          "data": "2026-11-17",
+          "rotulo": "ter",
+          "media_min": 17.4
+        },
+        {
+          "data": "2026-11-18",
+          "rotulo": "qua",
+          "media_min": 22.5
+        },
+        {
+          "data": "2026-11-19",
+          "rotulo": "qui",
+          "media_min": 27.5
+        },
+        {
+          "data": "2026-11-20",
+          "rotulo": "sex",
+          "media_min": 24.2
+        },
+        {
+          "data": "2026-11-21",
+          "rotulo": "sáb",
+          "media_min": 12.5
+        },
+        {
+          "data": "2026-11-22",
+          "rotulo": "dom",
+          "media_min": 12.5
+        }
+      ],
+      "dia_mais_pesado": {
+        "data": "2026-11-19",
+        "rotulo": "qui",
+        "media_min": 27.5
+      },
+      "pior_momento": {
+        "data": "2026-11-20",
+        "rotulo": "sex",
+        "hora": "07:03",
+        "minutos": 58.6,
+        "status": "vermelho"
+      },
+      "melhor_dia": {
+        "data": "2026-11-21",
+        "rotulo": "sáb",
+        "media_min": 12.5
+      }
+    }
+  },
+  "dias_com_chuva": 6,
+  "rajada_max_kmh": 45,
+  "leituras": 1344
+}
