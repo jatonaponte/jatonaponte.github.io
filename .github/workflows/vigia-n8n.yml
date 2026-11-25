@@ -1,0 +1,142 @@
+# Vigia externo do n8n: de hora em hora confere se o n8n responde e se a coleta está andando.
+# Avisa no Telegram só quando o estado muda (🔴 caiu / 🟢 voltou).
+# O estado fica no branch "vigia-estado" (arquivo estado.json), nunca na main.
+#
+# Segredos (Settings › Secrets and variables › Actions):
+#   VIGIA_URL           URL completa do /webhook/jatonaponte-status
+#   TELEGRAM_BOT_TOKEN  token do bot
+#   TELEGRAM_CHAT_ID    chat que recebe os avisos
+# Sem eles, o vigia só registra "não configurado" e sai sem erro.
+# Nada de IA, chave do n8n ou chave da Meta. Os segredos nunca são impressos (o repositório e os logs são públicos).
+name: Vigia do n8n
+
+on:
+  schedule:
+    - cron: '17 * * * *'   # de hora em hora, aos :17 (UTC; o GitHub pode atrasar alguns minutos)
+  workflow_dispatch:
+    inputs:
+      url_teste:
+        description: 'Teste: URL para checar no lugar da oficial (vazio = a oficial)'
+        required: false
+        default: ''
+
+permissions:
+  contents: write
+
+concurrency:
+  group: vigia-n8n
+  cancel-in-progress: false
+
+jobs:
+  vigiar:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: Lê o estado anterior (branch vigia-estado)
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git init -q estado && cd estado
+          git remote add origin "https://x-access-token:${GH_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+          if git fetch -q --depth 1 origin vigia-estado 2>/dev/null; then
+            git checkout -q -b vigia-estado FETCH_HEAD
+          else
+            git checkout -q --orphan vigia-estado
+          fi
+          test -f estado.json || echo '{"estado": "ok", "desde": ""}' > estado.json
+          echo "Estado anterior: $(cat estado.json)"
+
+      - name: Checa o n8n
+        env:
+          VIGIA_URL: ${{ secrets.VIGIA_URL }}
+          URL_TESTE: ${{ github.event.inputs.url_teste }}
+          TG_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TG_CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          python3 - <<'PY'
+          import json, os, time, urllib.request, urllib.parse
+          from datetime import datetime, timezone, timedelta
+          from zoneinfo import ZoneInfo
+
+          SP = ZoneInfo('America/Sao_Paulo')
+          url = (os.environ.get('URL_TESTE') or '').strip() or os.environ.get('VIGIA_URL', '').strip()
+          tg_token, tg_chat = os.environ.get('TG_TOKEN', ''), os.environ.get('TG_CHAT', '')
+          if not url or not tg_token or not tg_chat:
+              print('Vigia ainda não configurado (faltam segredos). Nada a fazer.')
+              raise SystemExit(0)
+          teste = bool((os.environ.get('URL_TESTE') or '').strip())
+          print('Modo teste (URL informada no Run workflow).' if teste else 'Checando a URL oficial.')
+
+          def checa():
+              """Devolve (ok, motivo, ultima_coleta_datetime_ou_None). Nunca imprime a URL."""
+              try:
+                  req = urllib.request.Request(url, headers={'User-Agent': 'jatonaponte-vigia'})
+                  with urllib.request.urlopen(req, timeout=30) as r:
+                      if r.status != 200:
+                          return False, f'HTTP {r.status}', None
+                      corpo = r.read(20000)
+              except urllib.error.HTTPError as e:
+                  return False, f'HTTP {e.code}', None
+              except Exception as e:
+                  return False, f'sem resposta ({type(e).__name__})', None
+              try:
+                  dados = json.loads(corpo)
+                  uc = datetime.fromisoformat(str(dados['ultima_coleta']).replace('Z', '+00:00'))
+                  if uc.tzinfo is None:
+                      uc = uc.replace(tzinfo=SP)
+              except Exception:
+                  return False, 'resposta sem ultima_coleta válida', None
+              idade = (datetime.now(timezone.utc) - uc).total_seconds() / 60
+              if idade > 45:
+                  return False, f'coleta parada há {idade:.0f} min', uc
+              return True, f'coleta de {idade:.0f} min atrás', uc
+
+          ok, motivo, uc = checa()
+          print('1ª checagem:', 'OK' if ok else 'FALHA', '-', motivo)
+          if not ok:
+              time.sleep(120)  # confere de novo antes de avisar (evita alarme falso)
+              ok, motivo, uc = checa()
+              print('2ª checagem:', 'OK' if ok else 'FALHA', '-', motivo)
+
+          with open('estado/estado.json') as f:
+              ant = json.load(f)
+          agora = datetime.now(SP)
+          novo = 'ok' if ok else 'falha'
+          if novo == ant.get('estado'):
+              print('Estado igual ao anterior (' + novo + '). Sem aviso.')
+              raise SystemExit(0)
+
+          if novo == 'falha':
+              desde = (uc.astimezone(SP) if uc else agora).strftime('%H:%M')
+              texto = f'🔴 n8n fora do ar / coleta parada desde {desde}\n({motivo})'
+          else:
+              texto = f'🟢 n8n voltou às {agora:%H:%M}'
+          if teste:
+              texto += '\n[teste do vigia]'
+
+          dados = urllib.parse.urlencode({'chat_id': tg_chat, 'text': texto}).encode()
+          try:
+              with urllib.request.urlopen(f'https://api.telegram.org/bot{tg_token}/sendMessage', data=dados, timeout=30) as r:
+                  enviado = r.status == 200
+          except Exception as e:
+              enviado = False
+              print('Falha ao enviar ao Telegram:', type(e).__name__)
+          if not enviado:
+              raise SystemExit(1)  # não grava o estado: tenta avisar de novo na próxima hora
+          print('Aviso enviado:', texto.splitlines()[0])
+
+          with open('estado/estado.json', 'w') as f:
+              json.dump({'estado': novo, 'desde': agora.isoformat(timespec='minutes'), 'motivo': motivo}, f, ensure_ascii=False)
+          with open(os.environ['GITHUB_ENV'], 'a') as f:
+              f.write('MUDOU=1\n')
+          PY
+
+      - name: Grava o novo estado (só quando mudou)
+        if: env.MUDOU == '1'
+        run: |
+          cd estado
+          git config user.name "jatonaponte-bot"
+          git config user.email "actions@users.noreply.github.com"
+          git add estado.json
+          git commit -q -m "vigia: $(python3 -c 'import json;d=json.load(open("estado.json"));print(d["estado"], d["desde"])')"
+          git push -q origin vigia-estado
